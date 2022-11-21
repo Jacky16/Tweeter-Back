@@ -1,9 +1,9 @@
 import environment from "../../../loadEnvironments.js";
-import type { NextFunction, RequestHandler, Response } from "express";
-import errorsMessage from "../../../errorsMessage";
+import type { NextFunction, Request, RequestHandler, Response } from "express";
 import createDebug from "debug";
 import chalk from "chalk";
 import type CustomError from "../../../CustomError/CustomError.js";
+import errorsMessage from "../../../errorsMessage.js";
 
 const debug = createDebug(`${environment.debug}server`);
 
@@ -26,5 +26,6 @@ export const generalError = (
   const publicMessage = error.publicMessage || message;
 
   debug(chalk.red.bold(error.message));
+
   res.status(statusCode).json({ error: publicMessage });
 };
