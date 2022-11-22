@@ -17,6 +17,7 @@ describe("Given the registerUser controller", () => {
     username: "Mario",
     email: "mario@gmail.com",
     password: "123",
+    alias: "@mario",
   })();
   const req: Partial<Request> = {
     body: userCredentials,
@@ -32,6 +33,7 @@ describe("Given the registerUser controller", () => {
       username: "Mario",
       email: "mario@gmail.com",
       password: "hashedPassword",
+      alias: "@mario",
     };
     const userDb = getRandomUserBd(userDatabase as UserDb)();
     const hashedPassword = "abc";
@@ -43,6 +45,7 @@ describe("Given the registerUser controller", () => {
           id: userDb._id.toString(),
           username: userDb.username,
           email: userDb.email,
+          alias: userDb.alias,
         },
       };
 
