@@ -10,7 +10,11 @@ const errorsMessage = {
     "Endpoint not found",
     404
   ),
-  registerUser: new CustomError("Error on register", "Error on register", 500),
+  registerUser: new CustomError(
+    "Error on register",
+    "User is already registered ",
+    409
+  ),
   validationError: new CustomError(
     "The details you provided don't meet the requirements",
     "The details you provided don't meet the requirements",
