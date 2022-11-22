@@ -6,6 +6,10 @@ const schemaUser = new Schema({
     required: true,
     unique: true,
   },
+  alias: {
+    type: String,
+    required: true,
+  },
   password: {
     type: String,
     required: true,

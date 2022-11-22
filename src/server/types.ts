@@ -6,6 +6,7 @@ export interface BaseUser {
 export interface UserRegisterCredentials extends BaseUser {
   password: string;
   email: string;
+  alias: string;
 }
 
 export interface UserBd extends UserRegisterCredentials {
