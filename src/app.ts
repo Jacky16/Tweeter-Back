@@ -1,4 +1,5 @@
 import express from "express";
+import morgan from "morgan";
 import {
   endpointNotFound,
   generalError,
@@ -6,6 +7,8 @@ import {
 
 const app = express();
 app.use(express.json());
+
+app.use(morgan("dev"));
 
 app.use(endpointNotFound);
 app.use(generalError);
