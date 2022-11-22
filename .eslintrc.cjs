@@ -19,6 +19,13 @@ module.exports = {
         "eslint-disable no-implicit-coercion": "off",
       },
     },
+    {
+      files: ["src/**/models/**/*.ts", "src/**/routers/**/*.ts"],
+      rules: {
+        "@typescript-eslint/naming-convention": "off",
+        "eslint-disable-next-line new-cap": "off",
+      },
+    },
   ],
   parserOptions: {
     ecmaVersion: "latest",
