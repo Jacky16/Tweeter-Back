@@ -7,18 +7,20 @@ import bcrypt from "bcrypt";
 
 export const registerUser: RequestHandler = async (req, res, next) => {
   try {
-    const { username, password, email } = req.body as UserRegisterCredentials;
+    const { username, password, email, alias } =
+      req.body as UserRegisterCredentials;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
       username,
+      alias,
       password: hashedPassword,
       email,
     });
 
     res.status(201).json({
-      user: { id: newUser._id.toString(), username, email: newUser.email },
+      user: { id: newUser._id.toString(), username, email, alias },
     });
   } catch (error: unknown) {
     const customError = new CustomError(

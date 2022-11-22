@@ -33,6 +33,7 @@ describe("Given the endpoint /user/register", () => {
         username: "Mario",
         password: "123",
         email: "mario@gmail.com",
+        alias: "@mario",
       };
 
       const response = await request(app)
@@ -46,6 +47,7 @@ describe("Given the endpoint /user/register", () => {
         username: registerUser.username,
         email: registerUser.email,
         id: newUser._id.toString(),
+        alias: newUser.alias,
       };
 
       expect(newUser).toHaveProperty("id", newUser.id);
@@ -72,11 +74,7 @@ describe("Given the endpoint /user/register", () => {
       const expectedStatus = 409;
       const expectedErrorMessage = errorsMessage.registerUser.publicMessage;
 
-      const randomUserInDb = getRandomUserRegisterCredentials({
-        username: "Mario",
-        email: "mario@gmail.com",
-        password: "123",
-      })();
+      const randomUserInDb = getRandomUserRegisterCredentials()();
 
       await User.create(randomUserInDb);
 
