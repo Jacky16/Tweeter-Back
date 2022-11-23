@@ -11,3 +11,13 @@ export const registerCredentialsSchema = {
       .regex(/[a-z0-9]+@[a-z]+.[a-z]{2,3}/),
   }),
 };
+
+export const loginCredentialsSchema = {
+  body: Joi.object({
+    password: Joi.string().min(3).required(),
+    email: Joi.string()
+      .min(3)
+      .required()
+      .regex(/[a-z0-9]+@[a-z]+.[a-z]{2,3}/),
+  }),
+};
