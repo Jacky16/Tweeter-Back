@@ -43,7 +43,7 @@ export const loginUser: RequestHandler = async (req, res, next) => {
   const { email, password } = req.body as UserLoginCredentials;
 
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).exec();
 
     if (!user) {
       next(errorsMessage.loginErrors.userNotFound);
