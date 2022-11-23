@@ -5,19 +5,13 @@ export const registerCredentialsSchema = {
     username: Joi.string().min(3).required(),
     password: Joi.string().min(3).required(),
     alias: Joi.string().min(2).required(),
-    email: Joi.string()
-      .min(3)
-      .required()
-      .regex(/[a-z0-9]+@[a-z]+.[a-z]{2,3}/),
+    email: Joi.string().min(3).email().required(),
   }),
 };
 
 export const loginCredentialsSchema = {
   body: Joi.object({
     password: Joi.string().min(3).required(),
-    email: Joi.string()
-      .min(3)
-      .required()
-      .regex(/[a-z0-9]+@[a-z]+.[a-z]{2,3}/),
+    email: Joi.string().min(3).email().required(),
   }),
 };

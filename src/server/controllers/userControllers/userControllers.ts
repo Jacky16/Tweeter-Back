@@ -59,7 +59,6 @@ export const loginUser: RequestHandler = async (req, res, next) => {
   const tokenPayload: UserTokenPayload = {
     id: user._id.toString(),
     username: user.username,
-    email,
     alias: user.alias,
   };
 
