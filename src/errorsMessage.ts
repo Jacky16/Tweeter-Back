@@ -37,7 +37,7 @@ const errorsMessage = {
       "Invalid Credentials",
       401
     ),
-    userNotFound: new CustomError("User not found", "Invalid Credentials", 404),
+    userNotFound: new CustomError("User not found", "Invalid Credentials", 401),
   },
 
   usersError: {
