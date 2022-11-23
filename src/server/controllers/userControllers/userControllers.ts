@@ -42,32 +42,28 @@ export const registerUser: RequestHandler = async (req, res, next) => {
 export const loginUser: RequestHandler = async (req, res, next) => {
   const { email, password } = req.body as UserLoginCredentials;
 
-  try {
-    const user = await User.findOne({ email }).exec();
+  const user = await User.findOne({ email }).exec();
 
-    if (!user) {
-      next(errorsMessage.loginErrors.userNotFound);
-      return;
-    }
-
-    const isValidPassword = await bcrypt.compare(password, user.password);
-
-    if (!isValidPassword) {
-      next(errorsMessage.loginErrors.invalidPassword);
-      return;
-    }
-
-    const tokenPayload: UserTokenPayload = {
-      id: user._id.toString(),
-      username: user.username,
-      email,
-      alias: user.alias,
-    };
-
-    const accessToken = jwt.sign(tokenPayload, environment.jwtSecret);
-
-    res.status(200).json({ token: accessToken });
-  } catch (error: unknown) {
-    next(error);
+  if (!user) {
+    next(errorsMessage.loginErrors.userNotFound);
+    return;
   }
+
+  const isValidPassword = await bcrypt.compare(password, user.password);
+
+  if (!isValidPassword) {
+    next(errorsMessage.loginErrors.invalidPassword);
+    return;
+  }
+
+  const tokenPayload: UserTokenPayload = {
+    id: user._id.toString(),
+    username: user.username,
+    email,
+    alias: user.alias,
+  };
+
+  const accessToken = jwt.sign(tokenPayload, environment.jwtSecret);
+
+  res.status(200).json({ token: accessToken });
 };

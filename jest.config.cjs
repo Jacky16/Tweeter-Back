@@ -8,7 +8,6 @@ module.exports = {
     "src/**/*.ts",
     "!src/**/index.ts",
     "!src/loadEnvironments.ts",
-    "!src/app.ts",
     "!src/errorsMessage.ts",
   ],
 };

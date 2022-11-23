@@ -6,7 +6,11 @@ import connectDatabase from "../../../database";
 import User from "../../../database/models/User";
 import errorsMessage from "../../../errorsMessage";
 import { getRandomUserRegisterCredentials } from "../../../factories/usersFactory";
-import type { UserRegisterCredentials } from "../../types";
+import type {
+  UserLoginCredentials,
+  UserRegisterCredentials,
+} from "../../types";
+import bcrypt from "bcrypt";
 
 let server: MongoMemoryServer;
 
@@ -85,6 +89,113 @@ describe("Given the endpoint /user/register", () => {
 
       expect(response.status).toStrictEqual(expectedStatus);
       expect(response.body).toHaveProperty("error", expectedErrorMessage);
+    });
+  });
+});
+
+describe("Given the endpoint /user/login", () => {
+  describe("When it receives a request with a email 'mario@gmail.com' and password '123", () => {
+    test("Then should return a response with status 200 and the user token", async () => {
+      const expectStatusCode = 200;
+
+      const userLogin: UserLoginCredentials = {
+        email: "mario@gmail.com",
+        password: "123",
+      };
+
+      const hashedPassword = await bcrypt.hash(userLogin.password, 10);
+      const userRegistered: Partial<UserRegisterCredentials> = {
+        email: userLogin.email,
+        password: hashedPassword,
+        alias: "@mario",
+        username: "mario",
+      };
+
+      await User.create(userRegistered as UserRegisterCredentials);
+
+      const response = await request(app)
+        .post("/user/login")
+        .send(userLogin)
+        .expect(expectStatusCode);
+
+      expect(response.statusCode).toBe(expectStatusCode);
+      expect(response.body).toHaveProperty("token");
+    });
+  });
+
+  describe("When it receives a request with incorrect password", () => {
+    test("Then should return a response with status 401", async () => {
+      const expectedStatusCode = 401;
+      const expectedErrorMessage =
+        errorsMessage.loginErrors.invalidPassword.publicMessage;
+
+      const userLogin: UserLoginCredentials = {
+        email: "mario@gmail.com",
+        password: "1234",
+      };
+
+      const hashedPassword = await bcrypt.hash("123", 10);
+      const userRegistered: Partial<UserRegisterCredentials> = {
+        email: userLogin.email,
+        password: hashedPassword,
+        alias: "@mario",
+        username: "mario",
+      };
+
+      await User.create(userRegistered as UserRegisterCredentials);
+
+      const response = await request(app)
+        .post("/user/login")
+        .send(userLogin)
+        .expect(expectedStatusCode);
+
+      expect(response.statusCode).toBe(expectedStatusCode);
+      expect(response.body).toHaveProperty("error", expectedErrorMessage);
+    });
+  });
+
+  describe("When it receives a request with incorrect email", () => {
+    test("Then should return a response with status 401", async () => {
+      const expectedStatusCode = 401;
+      const expectedErrorMessage =
+        errorsMessage.loginErrors.userNotFound.publicMessage;
+
+      const userLogin: UserLoginCredentials = {
+        email: "mario@gmail.com",
+        password: "1234",
+      };
+
+      const hashedPassword = await bcrypt.hash("123", 10);
+      const userRegistered: Partial<UserRegisterCredentials> = {
+        email: "mar@io.com",
+        password: hashedPassword,
+        alias: "@mario",
+        username: "mario",
+      };
+
+      await User.create(userRegistered as UserRegisterCredentials);
+
+      const response = await request(app)
+        .post("/user/login")
+        .send(userLogin)
+        .expect(expectedStatusCode);
+
+      expect(response.statusCode).toBe(expectedStatusCode);
+      expect(response.body).toHaveProperty("error", expectedErrorMessage);
+    });
+  });
+
+  describe("When receives a request with invalid body", () => {
+    test("Should return a response with status 500 with a message 'The details you provided don't meet the requirements'", async () => {
+      const expectedStatus = 500;
+      const expectedMessage = errorsMessage.validationError.publicMessage;
+
+      const response = await request(app)
+        .post("/user/login")
+        .expect(expectedStatus);
+
+      expect(response.status).toStrictEqual(expectedStatus);
+      expect(response.body).toHaveProperty("error", expectedMessage);
     });
   });
 });
