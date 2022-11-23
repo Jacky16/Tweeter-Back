@@ -1,6 +1,10 @@
 import { Factory } from "fishery";
 import { faker } from "@faker-js/faker";
-import type { UserBd, UserRegisterCredentials } from "../server/types";
+import type {
+  UserBd,
+  UserLoginCredentials,
+  UserRegisterCredentials,
+} from "../server/types";
 import mongoose from "mongoose";
 
 const usersRegisterCredentialsFactory = (user?: UserRegisterCredentials) =>
@@ -20,6 +24,12 @@ const usersDbFactory = (user?: UserBd) =>
     alias: user?.alias ?? `@${faker.name.lastName()}`,
   }));
 
+const usersLoginCredentialsFactory = (user?: UserLoginCredentials) =>
+  Factory.define<UserLoginCredentials>(() => ({
+    password: user?.password ?? faker.internet.password(),
+    email: user?.email ?? faker.internet.email(),
+  }));
+
 export const getRandomUserBd = (user?: UserBd) => () =>
   usersDbFactory(user).build();
 
@@ -29,3 +39,7 @@ export const getRandomUserList = (listUser: number) => () =>
 export const getRandomUserRegisterCredentials =
   (user?: UserRegisterCredentials) => () =>
     usersRegisterCredentialsFactory(user).build();
+
+export const getRandomUserLoginCredentials =
+  (user?: UserLoginCredentials) => () =>
+    usersLoginCredentialsFactory(user).build();
