@@ -103,7 +103,9 @@ describe("Given the loginUser controller", () => {
       };
       userInDatabase = getRandomUserBd(userInDatabase as UserDb)();
 
-      User.findOne = jest.fn().mockReturnValueOnce(userInDatabase);
+      User.findOne = jest.fn().mockReturnValueOnce({
+        exec: jest.fn().mockReturnValue(userInDatabase),
+      });
       bcrypt.compare = jest.fn().mockReturnValue(true);
       jwt.sign = jest.fn().mockReturnValueOnce(expectedToken);
 
@@ -117,7 +119,9 @@ describe("Given the loginUser controller", () => {
       test("Then the next function should be called with the user not found", async () => {
         const expectedError = errorsMessage.loginErrors.userNotFound;
         const next = jest.fn();
-        User.findOne = jest.fn().mockReturnValue(null);
+        User.findOne = jest.fn().mockReturnValue({
+          exec: jest.fn().mockReturnValue(null),
+        });
 
         await loginUser(req as Request, null, next);
 
@@ -126,7 +130,7 @@ describe("Given the loginUser controller", () => {
     });
 
     describe("When receives a request with a username with invalid password", () => {
-      test("Then next shoud be called with error 'Invalid password", async () => {
+      test("Then next should be called with error 'Invalid password", async () => {
         const expectedError = errorsMessage.loginErrors.invalidPassword;
         const next = jest.fn();
 
@@ -136,7 +140,9 @@ describe("Given the loginUser controller", () => {
         };
         userInDatabase = getRandomUserBd(userInDatabase as UserDb)();
 
-        User.findOne = jest.fn().mockReturnValueOnce(userInDatabase);
+        User.findOne = jest.fn().mockReturnValueOnce({
+          exec: jest.fn().mockReturnValue(userInDatabase),
+        });
         bcrypt.compare = jest.fn().mockReturnValue(false);
 
         await loginUser(req as Request, null, next);
