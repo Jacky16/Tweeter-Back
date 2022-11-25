@@ -6,6 +6,8 @@ const schemaTweet = new Schema({
   description: { type: String },
   image: { type: String },
   backupImage: { type: String },
+  dateOfCreation: { type: Date, default: Date.now },
+  visibilityOpen: { type: Boolean, default: true },
 });
 
 const Tweet = model("Tweet", schemaTweet, "tweets");

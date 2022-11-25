@@ -43,6 +43,19 @@ const errorsMessage = {
   usersError: {
     notFoundUsers: new CustomError("Not users found", "Not users found", 404),
   },
+
+  tweets: {
+    tweetsNotfound: new CustomError(
+      "Tweets not found",
+      "Tweets not found",
+      404
+    ),
+    paginationRangeError: new CustomError(
+      "Page is out of range",
+      "Page is out of range",
+      404
+    ),
+  },
 };
 
 export default errorsMessage;
