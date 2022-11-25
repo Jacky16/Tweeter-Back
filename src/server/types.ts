@@ -1,6 +1,9 @@
 import type { Types } from "mongoose";
 import type { JwtPayload } from "jsonwebtoken";
-
+import type { Request } from "express";
+export interface CustomRequest extends Request {
+  userId: string;
+}
 export interface BaseUser {
   email: string;
 }

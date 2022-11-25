@@ -3,7 +3,7 @@ import type { NextFunction, Response } from "express";
 import type { Error } from "mongoose";
 import Tweet from "../../../database/models/Tweet.js";
 import errorsMessage from "../../../errorsMessage.js";
-import type { CustomRequest } from "../types.js";
+import type { CustomRequest } from "../../types.js";
 
 export const getTweets = async (
   req: CustomRequest,
