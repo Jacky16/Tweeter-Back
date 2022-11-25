@@ -1,7 +1,7 @@
 import type { NextFunction, Response } from "express";
 import type { Error } from "mongoose";
-import errorsMessage from "../../../errorsMessage";
-import environment from "../../../loadEnvironments";
+import errorsMessage from "../../../errorsMessage.js";
+import environment from "../../../loadEnvironments.js";
 import jwt from "jsonwebtoken";
 import type { CustomRequest, UserTokenPayload } from "../../types";
 
