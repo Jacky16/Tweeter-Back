@@ -15,7 +15,7 @@ export const getTweets = async (
   try {
     const currentPage = +page;
 
-    const totalPages = Math.ceil((await Tweet.count()) / +limit);
+    const totalPages = Math.ceil((await Tweet.count().exec()) / +limit);
 
     if (currentPage < 1 || currentPage > totalPages) {
       next(errorsMessage.tweets.paginationRangeError);
@@ -29,6 +29,7 @@ export const getTweets = async (
 
     if (!tweets || tweets.length === 0) {
       next(errorsMessage.tweets.tweetsNotfound);
+      return;
     }
 
     res.status(200).json({

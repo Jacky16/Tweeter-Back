@@ -3,7 +3,6 @@ import type { TweetStructure } from "../server/types";
 import { faker } from "@faker-js/faker";
 
 const tweetFactory = Factory.define<TweetStructure>(() => ({
-  id: faker.database.mongodbObjectId(),
   author: faker.database.mongodbObjectId(),
   backupImage: faker.database.mongodbObjectId(),
   category: faker.random.word(),
