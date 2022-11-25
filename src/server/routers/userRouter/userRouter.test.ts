@@ -78,7 +78,7 @@ describe("Given the endpoint /user/register", () => {
       const expectedStatus = 409;
       const expectedErrorMessage = errorsMessage.registerUser.publicMessage;
 
-      const randomUserInDb = getRandomUserRegisterCredentials()();
+      const randomUserInDb = getRandomUserRegisterCredentials();
 
       await User.create(randomUserInDb);
 

@@ -1,4 +1,3 @@
-import type { Types } from "mongoose";
 import type { JwtPayload } from "jsonwebtoken";
 import type { Request } from "express";
 export interface CustomRequest extends Request {
@@ -19,7 +18,7 @@ export interface UserRegisterCredentials extends BaseUser {
 }
 
 export interface UserBd extends UserRegisterCredentials {
-  _id: Types.ObjectId;
+  _id: string;
 }
 
 export interface UserTokenPayload extends JwtPayload {

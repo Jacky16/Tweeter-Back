@@ -10,7 +10,7 @@ import jwt from "jsonwebtoken";
 import environment from "../../../loadEnvironments";
 import { getRandomTweets } from "../../../factories/tweetsFactory";
 
-const user = getRandomUserBd()();
+const user = getRandomUserBd();
 let server: MongoMemoryServer;
 
 const requestUserToken = jwt.sign(
