@@ -24,3 +24,14 @@ export interface UserTokenPayload extends JwtPayload {
   username: string;
   alias: string;
 }
+
+export interface TweetStructure {
+  id?: string;
+  author: string;
+  category: string;
+  description: string;
+  image: string;
+  backupImage: string;
+  dateOfCreation: string;
+  visibilityOpen: boolean;
+}
