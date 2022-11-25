@@ -11,10 +11,12 @@ const auth = (req: CustomRequest, res: Response, next: NextFunction) => {
     const authorization = req.header("Authorization");
     if (!authorization) {
       next(errorsMessage.authErrors.noTokenProvided);
+      return;
     }
 
     if (!authorization.startsWith("Bearer")) {
       next(errorsMessage.authErrors.missingBearer);
+      return;
     }
 
     const token: string = authorization.replace(/^Bearer\s*/, "");

@@ -12,7 +12,4 @@ const tweetFactory = Factory.define<TweetStructure>(() => ({
   visibilityOpen: faker.datatype.boolean(),
 }));
 
-export const getRandomTweet = (tweet?: TweetStructure) =>
-  tweetFactory.build(tweet);
-
 export const getRandomTweets = (size: number) => tweetFactory.buildList(size);
