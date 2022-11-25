@@ -1,10 +1,15 @@
 /* eslint-disable no-implicit-coercion */
-import type { RequestHandler } from "express";
+import type { NextFunction, Response } from "express";
 import type { Error } from "mongoose";
 import Tweet from "../../../database/models/Tweet.js";
 import errorsMessage from "../../../errorsMessage.js";
+import type { CustomRequest } from "../types.js";
 
-export const getTweets: RequestHandler = async (req, res, next) => {
+export const getTweets = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   const { page = 1, limit = 10 } = req.query;
 
   try {
