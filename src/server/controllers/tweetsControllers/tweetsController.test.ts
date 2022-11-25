@@ -64,11 +64,39 @@ describe("Given a getTweets controller", () => {
         expect(next).toBeCalledWith(errorsMessage.tweets.tweetsNotfound);
       });
     });
+
+    describe("And when try to get the tweets from database and it fails", () => {
+      test("Then the next function should called with error 'Tweets not found'", async () => {
+        const expectedError = new Error("Error");
+
+        Tweet.find = jest.fn().mockReturnValue({
+          limit: jest.fn().mockReturnValue({
+            skip: jest.fn().mockReturnValue({
+              exec: jest.fn().mockRejectedValue(expectedError),
+            }),
+          }),
+        });
+
+        await getTweets(req as CustomRequest, res as Response, next);
+
+        expect(next).toBeCalledWith(expectedError);
+      });
+    });
   });
 
   describe("When receive a CustomRequest with query params with page -1 and limit 5", () => {
     test("Then the next function should be called with the error 'Page out of range'", async () => {
       const request = { ...req, query: { page: "-1" } };
+
+      await getTweets(request as CustomRequest, null, next);
+
+      expect(next).toBeCalledWith(errorsMessage.tweets.paginationRangeError);
+    });
+  });
+
+  describe("When receive a CustomRequest with query params with page 1 and limit -5", () => {
+    test("Then the next function should be called with the error 'Limit out of range'", async () => {
+      const request = { ...req, query: { limit: "-5" } };
 
       await getTweets(request as CustomRequest, null, next);
 
