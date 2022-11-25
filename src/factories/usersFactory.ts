@@ -32,9 +32,6 @@ const usersLoginCredentialsFactory = Factory.define<UserLoginCredentials>(
 
 export const getRandomUserBd = (user?: UserBd) => usersDbFactory.build(user);
 
-export const getRandomUserList = (listUser: number) =>
-  usersDbFactory.buildList(listUser);
-
 export const getRandomUserRegisterCredentials = (
   user?: UserRegisterCredentials
 ) => usersRegisterCredentialsFactory.build(user);
