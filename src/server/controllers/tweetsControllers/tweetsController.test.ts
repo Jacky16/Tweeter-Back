@@ -2,7 +2,7 @@ import type { Response } from "express";
 import Tweet from "../../../database/models/Tweet";
 import errorsMessage from "../../../errorsMessage";
 import { getRandomTweets } from "../../../factories/tweetsFactory";
-import type { CustomRequest } from "../types";
+import type { CustomRequest } from "../../types";
 import { getTweets } from "./tweetsControllers";
 
 afterEach(() => {
