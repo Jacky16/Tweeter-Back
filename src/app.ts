@@ -11,6 +11,7 @@ import tweetsRouter from "./server/routers/tweetsRouter/tweetsRouter.js";
 import userRouter from "./server/routers/userRouter/userRouter.js";
 
 const app = express();
+app.disable("x-powered-by");
 
 app.use(cors(corsOptions));
 app.use(express.json());
