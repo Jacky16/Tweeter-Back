@@ -80,3 +80,16 @@ describe("Given a GET /tweets endpoint", () => {
     });
   });
 });
+
+describe("When it receives a request with valid token from a non-allowed origin", () => {
+  test("Then it should respond with an error and status 500", async () => {
+    const expectedStatus = 500;
+
+    const response = await request(app)
+      .get("/tweets")
+      .set("Origin", "http://allowed.com")
+      .expect(expectedStatus);
+
+    expect(response.body).toHaveProperty("error");
+  });
+});
