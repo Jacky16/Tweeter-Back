@@ -20,7 +20,7 @@ describe("Given the registerUser controller", () => {
     email: "mario@gmail.com",
     password: "123",
     alias: "@mario",
-  })();
+  });
   const req: Partial<Request> = {
     body: userCredentials,
   };
@@ -37,7 +37,7 @@ describe("Given the registerUser controller", () => {
       password: "hashedPassword",
       alias: "@mario",
     };
-    const userDb = getRandomUserBd(userDatabase as UserDb)();
+    const userDb = getRandomUserBd(userDatabase as UserDb);
     const hashedPassword = "abc";
 
     test("Then it should return a response with status 201 with the mario username and his email", async () => {
@@ -82,7 +82,8 @@ describe("Given the loginUser controller", () => {
   const userLogged = getRandomUserLoginCredentials({
     email: "mario@gmail.com",
     password: hashedPassword,
-  })();
+  });
+
   const req: Partial<Request> = {
     body: userLogged,
   };
@@ -101,7 +102,7 @@ describe("Given the loginUser controller", () => {
         email: userLogged.email,
         password: userLogged.password,
       };
-      userInDatabase = getRandomUserBd(userInDatabase as UserDb)();
+      userInDatabase = getRandomUserBd(userInDatabase as UserDb);
 
       User.findOne = jest.fn().mockReturnValueOnce({
         exec: jest.fn().mockReturnValue(userInDatabase),
@@ -138,7 +139,7 @@ describe("Given the loginUser controller", () => {
           email: userLogged.email,
           password: userLogged.password,
         };
-        userInDatabase = getRandomUserBd(userInDatabase as UserDb)();
+        userInDatabase = getRandomUserBd(userInDatabase as UserDb);
 
         User.findOne = jest.fn().mockReturnValueOnce({
           exec: jest.fn().mockReturnValue(userInDatabase),
