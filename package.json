@@ -12,7 +12,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage --watchAll=false",
     "test:dev": "jest --watchAll",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "delete-all-branches": "git branch | grep -v 'master' | xargs git branch -D"
   },
   "keywords": [],
   "author": "",
