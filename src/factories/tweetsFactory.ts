@@ -13,3 +13,5 @@ const tweetFactory = Factory.define<TweetStructure>(() => ({
 }));
 
 export const getRandomTweets = (size: number) => tweetFactory.buildList(size);
+
+export const getRandomTweet = () => tweetFactory.build();

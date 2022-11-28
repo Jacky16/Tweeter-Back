@@ -1,28 +1,32 @@
-import type { Response } from "express";
+/* eslint-disable @typescript-eslint/no-confusing-void-expression */
+/* eslint-disable @typescript-eslint/await-thenable */
+import type { Request, Response } from "express";
 import Tweet from "../../../database/models/Tweet";
 import errorsMessage from "../../../errorsMessage";
-import { getRandomTweets } from "../../../factories/tweetsFactory";
+import {
+  getRandomTweet,
+  getRandomTweets,
+} from "../../../factories/tweetsFactory";
 import type { CustomRequest } from "../../types";
-import { getTweets } from "./tweetsControllers";
-
-afterEach(() => {
-  jest.clearAllMocks();
-});
-const req: Partial<CustomRequest> = {
-  userId: "1234",
-  params: {},
-  query: { page: "1", limit: "5" },
-};
+import { getOneTweet, getTweets } from "./tweetsControllers";
 
 const res: Partial<Response> = {
   status: jest.fn().mockReturnThis(),
   json: jest.fn(),
 };
-
-const next = jest.fn();
-const tweets = getRandomTweets(10);
+afterEach(() => {
+  jest.clearAllMocks();
+});
 
 describe("Given a getTweets controller", () => {
+  const req: Partial<CustomRequest> = {
+    userId: "1234",
+    params: {},
+    query: { page: "1", limit: "5" },
+  };
+
+  const next = jest.fn();
+  const tweets = getRandomTweets(10);
   describe("When receive a CustomRequest with query params with page 1 and limit 5", () => {
     test("Then it should return a response 200 with the currentPage 1 , totalPages 2 and the list of tweets", async () => {
       const expectedStatus = 200;
@@ -101,6 +105,29 @@ describe("Given a getTweets controller", () => {
       await getTweets(request as CustomRequest, null, next);
 
       expect(next).toBeCalledWith(errorsMessage.tweets.paginationRangeError);
+    });
+  });
+});
+
+describe("Given a getOne controller", () => {
+  const req: Partial<Request> = {
+    params: { idTweet: "1234" },
+  };
+
+  describe("When receive a Request with params with idTweet '1234'", () => {
+    test("Then it should return a response 200 with the tweet", async () => {
+      const expectedStatus = 200;
+      const expectedTweet = getRandomTweet();
+      const expectedJson = { tweet: expectedTweet };
+
+      Tweet.findById = jest.fn().mockReturnValue({
+        exec: jest.fn().mockReturnValue(expectedTweet),
+      });
+
+      await getOneTweet(req as Request, res as Response, null);
+
+      expect(res.status).toBeCalledWith(expectedStatus);
+      expect(res.json).toBeCalledWith(expectedJson);
     });
   });
 });
