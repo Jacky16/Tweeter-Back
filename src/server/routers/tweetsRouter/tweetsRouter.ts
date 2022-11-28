@@ -5,5 +5,6 @@ import { getTweets } from "../../controllers/tweetsControllers/tweetsControllers
 const tweetsRouter = express.Router();
 
 tweetsRouter.get("/", getTweets);
+tweetsRouter.get("/:idTweet");
 
 export default tweetsRouter;
