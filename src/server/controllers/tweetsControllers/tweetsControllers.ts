@@ -1,12 +1,11 @@
 /* eslint-disable no-implicit-coercion */
-import type { NextFunction, Response } from "express";
+import type { NextFunction, Request, RequestHandler, Response } from "express";
 import type { Error } from "mongoose";
 import Tweet from "../../../database/models/Tweet.js";
 import errorsMessage from "../../../errorsMessage.js";
-import type { CustomRequest } from "../../types.js";
 
 export const getTweets = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -37,6 +36,23 @@ export const getTweets = async (
       currentPage: +page,
       tweets,
     });
+  } catch (error: unknown) {
+    next(error as Error);
+  }
+};
+
+export const getOneTweet: RequestHandler = async (req, res, next) => {
+  try {
+    const { idTweet } = req.params;
+
+    const tweet = await Tweet.findById(idTweet).exec();
+
+    if (!tweet) {
+      next(errorsMessage.tweet.tweetNotfound);
+      return;
+    }
+
+    res.status(200).json({ tweet });
   } catch (error: unknown) {
     next(error as Error);
   }

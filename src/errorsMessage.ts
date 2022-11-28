@@ -43,7 +43,9 @@ const errorsMessage = {
   usersError: {
     notFoundUsers: new CustomError("Not users found", "Not users found", 404),
   },
-
+  tweet: {
+    tweetNotfound: new CustomError("Tweet not found", "Tweet not found", 404),
+  },
   tweets: {
     tweetsNotfound: new CustomError(
       "Tweets not found",
