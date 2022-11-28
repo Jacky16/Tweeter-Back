@@ -8,7 +8,10 @@ import User from "../../../database/models/User";
 import { getRandomUserBd } from "../../../factories/usersFactory";
 import jwt from "jsonwebtoken";
 import environment from "../../../loadEnvironments";
-import { getRandomTweets } from "../../../factories/tweetsFactory";
+import {
+  getRandomTweet,
+  getRandomTweets,
+} from "../../../factories/tweetsFactory";
 
 const user = getRandomUserBd();
 let server: MongoMemoryServer;
@@ -72,6 +75,53 @@ describe("Given a GET /tweets endpoint", () => {
 
       const response = await request(app)
         .get("/tweets")
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .expect(expectStatus);
+
+      expect(response.status).toBe(expectStatus);
+      expect(response.body).toHaveProperty("error");
+    });
+  });
+});
+
+describe("Given a GET /tweets/:idTweet endpoint", () => {
+  describe("When it receives a request with valid token and a valid idTweet and there're  10 tweets in database", () => {
+    test("Then it should respond with status 200 and the tweet", async () => {
+      const expectStatus = 200;
+      const tweet = await Tweet.create(getRandomTweet());
+
+      const response = await request(app)
+        .get(`/tweets/${tweet._id.toString()}`)
+        .set("Authorization", `Bearer ${requestUserToken}`)
+        .expect(expectStatus);
+
+      expect(response.status).toBe(expectStatus);
+      expect(response.body).toHaveProperty("tweet");
+    });
+  });
+
+  describe("When it receives a request with invalid token and a valid idTweet and there're  10 tweets in database", () => {
+    test("Then it should respond with status 401 and an error message", async () => {
+      const expectStatus = 401;
+      const tweet = await Tweet.create(getRandomTweet());
+
+      const response = await request(app)
+        .get(`/tweets/${tweet._id.toString()}`)
+        .set("Authorization", `Bearer ${requestUserToken}invalid`)
+        .expect(expectStatus);
+
+      expect(response.status).toBe(expectStatus);
+      expect(response.body).toHaveProperty("error");
+    });
+  });
+
+  describe("When it receives a valid token and receives an unknown idTweet", () => {
+    test("Then it should respond with status 404 and an error message", async () => {
+      const expectStatus = 404;
+      await Tweet.create(getRandomTweets(10));
+
+      const response = await request(app)
+        .get(`/tweets/6380a8a63cf4ded22b9fa084`)
         .set("Authorization", `Bearer ${requestUserToken}`)
         .expect(expectStatus);
 
