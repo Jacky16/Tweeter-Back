@@ -129,5 +129,35 @@ describe("Given a getOne controller", () => {
       expect(res.status).toBeCalledWith(expectedStatus);
       expect(res.json).toBeCalledWith(expectedJson);
     });
+
+    describe("And the tweets with id '1234' doesn't exist", () => {
+      test("Then the next function should be called with the error 'Tweet not found'", async () => {
+        const expectedError = errorsMessage.tweet.tweetNotfound;
+        const next = jest.fn();
+
+        Tweet.findById = jest.fn().mockReturnValue({
+          exec: jest.fn().mockReturnValue(null),
+        });
+
+        await getOneTweet(req as Request, null, next);
+
+        expect(next).toBeCalledWith(expectedError);
+      });
+    });
+
+    describe("And when try to get the tweet from database and it fails", () => {
+      test("The next should be called with 'Error on database'", async () => {
+        const expectedError = new Error("Error on database");
+        const next = jest.fn();
+
+        Tweet.findById = jest.fn().mockReturnValue({
+          exec: jest.fn().mockRejectedValue(expectedError),
+        });
+
+        await getOneTweet(req as Request, null, next);
+
+        expect(next).toBeCalledWith(expectedError);
+      });
+    });
   });
 });
