@@ -30,12 +30,12 @@ beforeEach(async () => {
 });
 
 describe("Given the endpoint /user/register", () => {
-  describe("When it receives a POST request with username:'mario' email:'mario@gmail.com' and password:123 ", () => {
+  describe("When it receives a POST request with username:'mario' email:'mario@gmail.com' and password:1234567890 ", () => {
     test("Then it should return a response with status 201 with username Mario and email 'mario@gmail.com'", async () => {
       const expectedStatus = 201;
       const registerUser: UserRegisterCredentials = {
         username: "Mario",
-        password: "123",
+        password: "1234567890",
         email: "mario@gmail.com",
         alias: "@mario",
       };
