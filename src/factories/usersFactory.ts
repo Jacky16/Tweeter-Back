@@ -25,7 +25,7 @@ const usersDbFactory = Factory.define<UserBd>(() => ({
 
 const usersLoginCredentialsFactory = Factory.define<UserLoginCredentials>(
   () => ({
-    password: faker.internet.password(),
+    password: faker.internet.password(9),
     email: faker.internet.email(),
   })
 );
