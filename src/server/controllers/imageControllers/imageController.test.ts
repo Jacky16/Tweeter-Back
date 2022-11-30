@@ -32,11 +32,11 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await fs.unlink(
-    `${uploadPath}/${nameFile.name}${timestamp}${nameFile.extension}`
+    path.join(uploadPath, `${nameFile.name}${timestamp}${nameFile.extension}`)
   );
 });
-const mockFile = jest.fn();
 
+const mockFile = jest.fn();
 jest.mock("sharp", () => () => ({
   webp: jest.fn().mockReturnValue({
     toFormat: jest.fn().mockReturnValue({
@@ -109,13 +109,11 @@ describe("Given the formatImage controller", () => {
   });
 
   describe("When receives a Image Request with an image file and fs link reject a error", () => {
-    test("Then the next function should be called with and error 'Error'", async () => {
-      const expectedError = new Error("Error");
-
-      fs.unlink = jest.fn().mockRejectedValue(expectedError);
+    test("Then the next function should be called", async () => {
+      fs.unlink = jest.fn().mockRejectedValueOnce(new Error("Error"));
       await formatImage(req as ImageRequest, null, next);
 
-      expect(next).toHaveBeenCalledWith(expectedError);
+      expect(next).toHaveBeenCalled();
     });
   });
 });
