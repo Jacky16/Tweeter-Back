@@ -32,13 +32,15 @@ export interface UserTokenPayload extends JwtPayload {
   alias: string;
 }
 
-export interface TweetStructure {
-  id?: string;
+export interface TweetBody {
   author: string;
-  category: string;
   description: string;
-  image: string;
-  backupImage: string;
   dateOfCreation: string;
   visibilityOpen: boolean;
+  category: string;
+}
+export interface TweetStructure extends TweetBody {
+  id?: string;
+  image: string;
+  backupImage: string;
 }

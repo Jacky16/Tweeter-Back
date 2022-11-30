@@ -3,6 +3,7 @@ import type { NextFunction, Request, RequestHandler, Response } from "express";
 import type { Error } from "mongoose";
 import Tweet from "../../../database/models/Tweet.js";
 import errorsMessage from "../../../errorsMessage.js";
+import type { ImageRequest, TweetBody } from "../../types.js";
 
 export const getTweets = async (
   req: Request,
@@ -53,6 +54,31 @@ export const getOneTweet: RequestHandler = async (req, res, next) => {
     }
 
     res.status(200).json({ tweet });
+  } catch (error: unknown) {
+    next(error as Error);
+  }
+};
+
+export const createTweet = async (
+  req: ImageRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { description, category, visibilityOpen, author, dateOfCreation } =
+      req.body as TweetBody;
+
+    const tweetToAdd = {
+      description,
+      category,
+      visibilityOpen,
+      author,
+      dateOfCreation,
+      image: req.imageFileName,
+    };
+    const tweet = await Tweet.create(tweetToAdd);
+
+    res.status(201).json({ tweet });
   } catch (error: unknown) {
     next(error as Error);
   }
