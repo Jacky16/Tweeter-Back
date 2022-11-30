@@ -4,6 +4,7 @@ import { validate } from "express-validation";
 import multer from "multer";
 import path from "path";
 import {
+  backupImage,
   formatImage,
   renameImage,
 } from "../../controllers/imageControllers/imageControllers.js";
@@ -18,7 +19,7 @@ const tweetsRouter = express.Router();
 const upload = multer({
   dest: path.join("assets", "images"),
   limits: {
-    fileSize: 8000000,
+    fileSize: 52428800,
   },
 });
 
@@ -29,7 +30,8 @@ tweetsRouter.post(
   upload.single("image"),
   validate(tweetSchema, {}, { abortEarly: false }),
   renameImage,
-  formatImage
+  formatImage,
+  backupImage
 );
 
 export default tweetsRouter;

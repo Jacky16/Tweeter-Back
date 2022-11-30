@@ -1,7 +1,7 @@
-import environment from "../loadEnvironments";
+import environment from "../loadEnvironments.js";
 import { createClient } from "@supabase/supabase-js";
 
-export const supabaseClient = createClient(
+const supabaseClient = createClient(
   environment.supabaseUrl,
   environment.supabaseKey
 );

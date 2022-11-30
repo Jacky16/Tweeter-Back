@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import errorsMessage from "../../../errorsMessage.js";
 import sharp from "sharp";
+import { bucket } from "../../../utils/supabase.js";
 
 const removeExtension = (filename: string) =>
   filename.substring(0, filename.lastIndexOf(".")) || filename;
@@ -45,7 +46,6 @@ export const formatImage = async (
   try {
     const { imageFileName } = req;
     const { destination } = req.file;
-
     const fileExtension = path.extname(imageFileName);
     const fileBaseName = path.basename(imageFileName, fileExtension);
 
@@ -55,6 +55,37 @@ export const formatImage = async (
       .toFile(path.join(destination, `${fileBaseName}.webp`));
 
     await fs.unlink(path.join(destination, imageFileName));
+
+    req.imageFileName = `${fileBaseName}.webp`;
+
+    next();
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+export const backupImage = async (
+  req: ImageRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { imageFileName } = req;
+  const { destination } = req.file;
+
+  try {
+    const imageBaseName = removeExtension(imageFileName);
+
+    const fileContent = await fs.readFile(
+      path.join(destination, imageBaseName)
+    );
+
+    await bucket.upload(imageFileName, fileContent);
+
+    const {
+      data: { publicUrl },
+    } = bucket.getPublicUrl(imageFileName);
+
+    req.publicImageUrl = publicUrl;
 
     next();
   } catch (error: unknown) {
