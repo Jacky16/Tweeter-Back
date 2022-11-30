@@ -6,6 +6,7 @@ const tweetSchema = {
     category: Joi.string().valid("comedy", "sports").required(),
     visibilityOpen: Joi.boolean().required(),
     description: Joi.string().required(),
+    dateOfCreation: Joi.date().required(),
   }),
 };
 

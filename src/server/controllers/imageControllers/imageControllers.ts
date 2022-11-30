@@ -71,12 +71,9 @@ export const backupImage = async (
 ) => {
   const { imageFileName } = req;
   const { destination } = req.file;
-
   try {
-    const imageBaseName = removeExtension(imageFileName);
-
     const fileContent = await fs.readFile(
-      path.join(destination, imageBaseName)
+      path.join(destination, imageFileName)
     );
 
     await bucket.upload(imageFileName, fileContent);
