@@ -58,6 +58,16 @@ const errorsMessage = {
       404
     ),
   },
+  images: {
+    imageCompressionError: {
+      publicMessage: "Error on compress image",
+    },
+    imageNotProvided: new CustomError(
+      "Image not provided",
+      "Image not provided",
+      400
+    ),
+  },
 };
 
 export default errorsMessage;
