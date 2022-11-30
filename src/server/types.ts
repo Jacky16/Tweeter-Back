@@ -3,6 +3,10 @@ import type { Request } from "express";
 export interface CustomRequest extends Request {
   userId: string;
 }
+
+export interface ImageRequest extends Request {
+  imageFileName: string;
+}
 export interface BaseUser {
   email: string;
 }
