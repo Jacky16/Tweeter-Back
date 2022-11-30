@@ -5,7 +5,9 @@ export interface CustomRequest extends Request {
 }
 
 export interface ImageRequest extends Request {
+  image: File;
   imageFileName: string;
+  publicImageUrl: string;
 }
 export interface BaseUser {
   email: string;
@@ -16,7 +18,6 @@ export interface UserLoginCredentials extends BaseUser {
 }
 export interface UserRegisterCredentials extends BaseUser {
   username: string;
-
   password: string;
   alias: string;
 }

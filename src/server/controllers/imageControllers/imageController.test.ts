@@ -1,9 +1,10 @@
 import errorsMessage from "../../../errorsMessage";
 import { getRandomTweet } from "../../../factories/tweetsFactory";
 import type { ImageRequest } from "../../types";
-import { formatImage, renameImage } from "./imageControllers";
+import { backupImage, formatImage, renameImage } from "./imageControllers";
 import fs from "fs/promises";
 import path from "path";
+import { bucket } from "../../../utils/supabase";
 
 const uploadPath = "assets/images";
 const nameFile = {
@@ -114,6 +115,37 @@ describe("Given the formatImage controller", () => {
       await formatImage(req as ImageRequest, null, next);
 
       expect(next).toHaveBeenCalled();
+    });
+  });
+});
+
+describe("Given the backupImage controller", () => {
+  describe("When receives a Image Request with an image file", () => {
+    test("Then the next function should be called", async () => {
+      fs.readFile = jest.fn().mockResolvedValue(true);
+
+      bucket.upload = jest.fn().mockResolvedValueOnce({
+        data: {
+          publicUrl: "url",
+        },
+      });
+      await backupImage(req as ImageRequest, null, next);
+
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe("When recives a ImageRequest inalid image", () => {
+    test("Then the next function should be called with a error", async () => {
+      const expectedError = new Error("Error");
+
+      fs.readFile = jest.fn().mockResolvedValue(true);
+
+      bucket.upload = jest.fn().mockRejectedValueOnce(expectedError);
+
+      await backupImage(req as ImageRequest, null, next);
+
+      expect(next).toHaveBeenCalledWith(expectedError);
     });
   });
 });
