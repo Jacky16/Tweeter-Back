@@ -7,8 +7,8 @@ import {
   getRandomTweet,
   getRandomTweets,
 } from "../../../factories/tweetsFactory";
-import type { CustomRequest } from "../../types";
-import { getOneTweet, getTweets } from "./tweetsControllers";
+import type { CustomRequest, ImageRequest } from "../../types";
+import { createTweet, getOneTweet, getTweets } from "./tweetsControllers";
 
 const res: Partial<Response> = {
   status: jest.fn().mockReturnThis(),
@@ -158,6 +158,45 @@ describe("Given a getOne controller", () => {
 
         expect(next).toBeCalledWith(expectedError);
       });
+    });
+  });
+});
+
+describe("Given the createTweet controller", () => {
+  describe("When receive a ImageRequest with a tweet as body", () => {
+    test("Then it should return the response with status 201 and the tweet created", async () => {
+      const expectedStatus = 201;
+      const expectedTweet = getRandomTweet();
+      const expectedJson = { tweet: expectedTweet };
+      const req: Partial<ImageRequest> = {
+        body: expectedTweet,
+        imageFileName: "image.jpg",
+      };
+
+      Tweet.create = jest.fn().mockReturnValue(expectedTweet);
+
+      await createTweet(req as ImageRequest, res as Response, null);
+
+      expect(res.status).toBeCalledWith(expectedStatus);
+      expect(res.json).toHaveBeenCalledWith(expectedJson);
+    });
+  });
+
+  describe("When receive a ImageRequest with a tweet as body and create the tweet fails", () => {
+    test("Then the next function should be called with the error 'Error on database'", async () => {
+      const expectedError = new Error("Error on database");
+
+      const req: Partial<ImageRequest> = {
+        body: getRandomTweet(),
+        imageFileName: "image.jpg",
+      };
+
+      Tweet.create = jest.fn().mockRejectedValue(expectedError);
+
+      const next = jest.fn();
+      await createTweet(req as ImageRequest, null, next);
+
+      expect(next).toBeCalledWith(expectedError);
     });
   });
 });
