@@ -9,6 +9,7 @@ import {
   renameImage,
 } from "../../controllers/imageControllers/imageControllers.js";
 import {
+  createTweet,
   getOneTweet,
   getTweets,
 } from "../../controllers/tweetsControllers/tweetsControllers.js";
@@ -31,7 +32,8 @@ tweetsRouter.post(
   validate(tweetSchema, {}, { abortEarly: false }),
   renameImage,
   formatImage,
-  backupImage
+  backupImage,
+  createTweet
 );
 
 export default tweetsRouter;
