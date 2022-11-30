@@ -1,7 +1,7 @@
 import errorsMessage from "../../../errorsMessage";
 import { getRandomTweet } from "../../../factories/tweetsFactory";
 import type { ImageRequest } from "../../types";
-import { renameImage } from "./imageControllers";
+import { formatImage, renameImage } from "./imageControllers";
 import fs from "fs/promises";
 import path from "path";
 
@@ -26,16 +26,26 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
+beforeAll(async () => {
+  await fs.writeFile(path.join(uploadPath, nameFile.name), nameFile.name);
+});
+
+afterAll(async () => {
+  await fs.unlink(
+    path.join(uploadPath, `${nameFile.name}${timestamp}${nameFile.extension}`)
+  );
+});
+
+const mockFile = jest.fn();
+jest.mock("sharp", () => () => ({
+  webp: jest.fn().mockReturnValue({
+    toFormat: jest.fn().mockReturnValue({
+      toFile: mockFile,
+    }),
+  }),
+}));
+
 describe("Given the renameImage controller", () => {
-  beforeEach(async () => {
-    await fs.writeFile(path.join(uploadPath, nameFile.name), Buffer.from(""));
-  });
-
-  afterAll(async () => {
-    await fs.unlink(`${uploadPath}/${nameFile.name}${timestamp}`);
-    await fs.unlink(`${uploadPath}/${nameFile.name}`);
-  });
-
   const file: Partial<Express.Multer.File> = {
     originalname: `${nameFile.name}`,
     filename: "hash",
@@ -74,6 +84,36 @@ describe("Given the renameImage controller", () => {
       await renameImage(req as ImageRequest, null, next);
 
       expect(next).toHaveBeenCalledWith(expectedError);
+    });
+  });
+});
+
+describe("Given the formatImage controller", () => {
+  const file: Partial<Express.Multer.File> = {
+    originalname: `${nameFile.name}${nameFile.extension}`,
+    filename: "hash",
+    destination: uploadPath,
+    path: path.join(uploadPath, nameFile.name),
+  };
+
+  req.file = file as Express.Multer.File;
+  req.imageFileName = `${nameFile.name}${timestamp}${nameFile.extension}`;
+
+  describe("When receives a Image Request with an image file", () => {
+    test("Then the next function should be called", async () => {
+      fs.unlink = jest.fn().mockResolvedValueOnce(true);
+      await formatImage(req as ImageRequest, null, next);
+
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe("When receives a Image Request with an image file and fs link reject a error", () => {
+    test("Then the next function should be called", async () => {
+      fs.unlink = jest.fn().mockRejectedValueOnce(new Error("Error"));
+      await formatImage(req as ImageRequest, null, next);
+
+      expect(next).toHaveBeenCalled();
     });
   });
 });

@@ -3,7 +3,10 @@ import express from "express";
 import { validate } from "express-validation";
 import multer from "multer";
 import path from "path";
-import { renameImage } from "../../controllers/imageControllers/imageControllers.js";
+import {
+  formatImage,
+  renameImage,
+} from "../../controllers/imageControllers/imageControllers.js";
 import {
   getOneTweet,
   getTweets,
@@ -25,7 +28,8 @@ tweetsRouter.post(
   "/create",
   upload.single("image"),
   validate(tweetSchema, {}, { abortEarly: false }),
-  renameImage
+  renameImage,
+  formatImage
 );
 
 export default tweetsRouter;
