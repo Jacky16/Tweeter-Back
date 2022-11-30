@@ -10,6 +10,7 @@ const environment = {
   jwtSecret: process.env.JWT_SECRET,
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseKey: process.env.SUPABASE_KEY,
+  supabaseBucket: process.env.SUPABASE_BUCKET,
 };
 
 export default environment;
