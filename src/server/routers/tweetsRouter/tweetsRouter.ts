@@ -19,7 +19,7 @@ const tweetsRouter = express.Router();
 const upload = multer({
   dest: path.join("assets", "images"),
   limits: {
-    fileSize: 52428800,
+    fileSize: 8000000,
   },
 });
 
