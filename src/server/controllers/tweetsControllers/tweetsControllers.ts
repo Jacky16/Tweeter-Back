@@ -47,7 +47,12 @@ export const getOneTweet: RequestHandler = async (req, res, next) => {
   try {
     const { idTweet } = req.params;
 
-    const tweet = await Tweet.findById(idTweet).exec();
+    const tweet = await Tweet.findById(idTweet)
+      .populate({
+        select: "username alias",
+        path: "author",
+      })
+      .exec();
 
     if (!tweet) {
       next(errorsMessage.tweet.tweetNotfound);

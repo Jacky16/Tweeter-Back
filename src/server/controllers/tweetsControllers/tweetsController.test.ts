@@ -128,7 +128,9 @@ describe("Given a getOne controller", () => {
       const expectedJson = { tweet: expectedTweet };
 
       Tweet.findById = jest.fn().mockReturnValue({
-        exec: jest.fn().mockReturnValue(expectedTweet),
+        populate: jest.fn().mockReturnValue({
+          exec: jest.fn().mockReturnValue(expectedTweet),
+        }),
       });
 
       await getOneTweet(req as Request, res as Response, null);
@@ -143,7 +145,9 @@ describe("Given a getOne controller", () => {
         const next = jest.fn();
 
         Tweet.findById = jest.fn().mockReturnValue({
-          exec: jest.fn().mockReturnValue(null),
+          populate: jest.fn().mockReturnValue({
+            exec: jest.fn().mockReturnValue(null),
+          }),
         });
 
         await getOneTweet(req as Request, null, next);
@@ -158,7 +162,9 @@ describe("Given a getOne controller", () => {
         const next = jest.fn();
 
         Tweet.findById = jest.fn().mockReturnValue({
-          exec: jest.fn().mockRejectedValue(expectedError),
+          populate: jest.fn().mockReturnValue({
+            exec: jest.fn().mockRejectedValue(expectedError),
+          }),
         });
 
         await getOneTweet(req as Request, null, next);
