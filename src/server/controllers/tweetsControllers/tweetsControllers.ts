@@ -25,6 +25,7 @@ export const getTweets = async (
     const tweets = await Tweet.find()
       .limit(+limit)
       .skip((+page - 1) * +limit)
+      .populate({ select: "username alias", path: "author" })
       .exec();
 
     if (!tweets || tweets.length === 0) {

@@ -43,7 +43,9 @@ describe("Given a getTweets controller", () => {
       Tweet.find = jest.fn().mockReturnValue({
         limit: jest.fn().mockReturnValue({
           skip: jest.fn().mockReturnValue({
-            exec: jest.fn().mockReturnValue(tweets),
+            populate: jest.fn().mockReturnValue({
+              exec: jest.fn().mockReturnValue(tweets),
+            }),
           }),
         }),
       });
@@ -59,10 +61,13 @@ describe("Given a getTweets controller", () => {
         Tweet.find = jest.fn().mockReturnValue({
           limit: jest.fn().mockReturnValue({
             skip: jest.fn().mockReturnValue({
-              exec: jest.fn().mockReturnValue(null),
+              populate: jest.fn().mockReturnValue({
+                exec: jest.fn().mockReturnValue(null),
+              }),
             }),
           }),
         });
+
         await getTweets(req as CustomRequest, res as Response, next);
 
         expect(next).toBeCalledWith(errorsMessage.tweets.tweetsNotfound);
@@ -76,7 +81,9 @@ describe("Given a getTweets controller", () => {
         Tweet.find = jest.fn().mockReturnValue({
           limit: jest.fn().mockReturnValue({
             skip: jest.fn().mockReturnValue({
-              exec: jest.fn().mockRejectedValue(expectedError),
+              populate: jest.fn().mockReturnValue({
+                exec: jest.fn().mockRejectedValue(expectedError),
+              }),
             }),
           }),
         });
