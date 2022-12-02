@@ -33,17 +33,28 @@ export const getTweets = async (
       return;
     }
 
+    const tweetsToAdd = tweets.map((tweet) => ({
+      ...tweet.toJSON(),
+      image: `${req.protocol}://${req.get("host")}/assets/images/${
+        tweet.image
+      }`,
+    }));
+
     res.status(200).json({
       totalPages,
       currentPage: +page,
-      tweets,
+      tweets: tweetsToAdd,
     });
   } catch (error: unknown) {
     next(error as Error);
   }
 };
 
-export const getOneTweet: RequestHandler = async (req, res, next) => {
+export const getOneTweet: RequestHandler = async (
+  req: ImageRequest,
+  res,
+  next
+) => {
   try {
     const { idTweet } = req.params;
 
@@ -59,7 +70,12 @@ export const getOneTweet: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    res.status(200).json({ tweet });
+    const imageUrl = `${req.protocol}://${req.get("host")}/assets/images/${
+      tweet.image
+    }`;
+    const tweetResponse = { ...tweet.toJSON(), image: imageUrl };
+
+    res.status(200).json({ tweet: tweetResponse });
   } catch (error: unknown) {
     next(error as Error);
   }
@@ -82,6 +98,7 @@ export const createTweet = async (
       dateOfCreation,
       image: req.imageFileName,
     };
+
     const tweet = await Tweet.create(tweetToAdd);
 
     res.status(201).json({ tweet });

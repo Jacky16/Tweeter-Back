@@ -23,21 +23,27 @@ describe("Given a getTweets controller", () => {
     userId: "1234",
     params: {},
     query: { page: "1", limit: "5" },
+    protocol: "http",
+    host: "localhost:3000",
   };
 
   const next = jest.fn();
-  const tweets = getRandomTweets(10);
+  const mockTweets = getRandomTweets(10);
+  const tweets = {
+    map: jest.fn().mockReturnValue(mockTweets),
+  };
   describe("When receive a CustomRequest with query params with page 1 and limit 5", () => {
     test("Then it should return a response 200 with the currentPage 1 , totalPages 2 and the list of tweets", async () => {
       const expectedStatus = 200;
       const expectedJson = {
         totalPages: 2,
         currentPage: 1,
-        tweets,
+        tweets: mockTweets,
       };
 
+      Math.ceil = jest.fn().mockReturnValue(expectedJson.totalPages);
       Tweet.count = jest.fn().mockReturnValue({
-        exec: jest.fn().mockReturnValue(tweets.length),
+        exec: jest.fn().mockReturnValue(tweets),
       });
 
       Tweet.find = jest.fn().mockReturnValue({
@@ -104,32 +110,36 @@ describe("Given a getTweets controller", () => {
       expect(next).toBeCalledWith(errorsMessage.tweets.paginationRangeError);
     });
   });
-
-  describe("When receive a CustomRequest with query params with page 1 and limit -5", () => {
-    test("Then the next function should be called with the error 'Limit out of range'", async () => {
-      const request = { ...req, query: { limit: "-5" } };
-
-      await getTweets(request as CustomRequest, null, next);
-
-      expect(next).toBeCalledWith(errorsMessage.tweets.paginationRangeError);
-    });
-  });
 });
 
 describe("Given a getOne controller", () => {
+  const host = "localhost:3000";
+  const protocol = "http";
   const req: Partial<Request> = {
     params: { idTweet: "1234" },
+    protocol,
+    get: jest.fn().mockReturnValue(host),
   };
 
   describe("When receive a Request with params with idTweet '1234'", () => {
     test("Then it should return a response 200 with the tweet", async () => {
       const expectedStatus = 200;
       const expectedTweet = getRandomTweet();
+
+      const nameImage = expectedTweet.image;
+      const urlImage = `${protocol}://${host}/assets/images/${nameImage}`;
+
+      expectedTweet.image = urlImage;
+
       const expectedJson = { tweet: expectedTweet };
 
       Tweet.findById = jest.fn().mockReturnValue({
         populate: jest.fn().mockReturnValue({
-          exec: jest.fn().mockReturnValue(expectedTweet),
+          exec: jest.fn().mockReturnValue({
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            toJSON: jest.fn().mockReturnValue(expectedTweet),
+            image: nameImage,
+          }),
         }),
       });
 
