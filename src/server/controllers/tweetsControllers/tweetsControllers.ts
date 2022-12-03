@@ -112,8 +112,10 @@ export const getTweetsByCategory = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { page = 1, limit = 5 } = req.query;
-  const { category: categoryParam } = req.params;
+  const {
+    query: { page = 1, limit = 5 },
+    params: { category: categoryParam },
+  } = req;
 
   try {
     const existCategory = categories.find(
