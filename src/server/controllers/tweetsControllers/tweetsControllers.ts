@@ -1,6 +1,7 @@
 /* eslint-disable no-implicit-coercion */
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import type { Error } from "mongoose";
+import categories from "../../../categories.js";
 import Tweet from "../../../database/models/Tweet.js";
 import errorsMessage from "../../../errorsMessage.js";
 import type { ImageRequest, TweetBody } from "../../types.js";
@@ -57,7 +58,6 @@ export const getOneTweet: RequestHandler = async (
 ) => {
   try {
     const { idTweet } = req.params;
-
     const tweet = await Tweet.findById(idTweet)
       .populate({
         select: "username alias",
@@ -102,6 +102,64 @@ export const createTweet = async (
     const tweet = await Tweet.create(tweetToAdd);
 
     res.status(201).json({ tweet });
+  } catch (error: unknown) {
+    next(error as Error);
+  }
+};
+
+export const getTweetsByCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { page = 1, limit = 5 } = req.query;
+  const { category: categoryParam } = req.params;
+
+  try {
+    const existCategory = categories.find(
+      (category) => category === categoryParam
+    );
+
+    if (!existCategory) {
+      next(errorsMessage.tweets.categoryNotfound);
+      return;
+    }
+
+    const currentPage = +page;
+
+    const totalTweetsWithCategory = await Tweet.count({
+      category: categoryParam,
+    }).exec();
+
+    if (totalTweetsWithCategory === 0) {
+      next(errorsMessage.tweets.tweetsNotfound);
+      return;
+    }
+
+    const totalPages = Math.ceil(totalTweetsWithCategory / +limit);
+    if (currentPage < 1 || currentPage > totalPages) {
+      next(errorsMessage.tweets.paginationRangeError);
+      return;
+    }
+
+    const tweets = await Tweet.find({ category: categoryParam })
+      .limit(+limit)
+      .skip((+page - 1) * +limit)
+      .populate({ select: "username alias", path: "author" })
+      .exec();
+
+    const tweetsToAdd = tweets.map((tweet) => ({
+      ...tweet.toJSON(),
+      image: `${req.protocol}://${req.get("host")}/assets/images/${
+        tweet.image
+      }`,
+    }));
+
+    res.status(200).json({
+      totalPages,
+      currentPage: +page,
+      tweets: tweetsToAdd,
+    });
   } catch (error: unknown) {
     next(error as Error);
   }

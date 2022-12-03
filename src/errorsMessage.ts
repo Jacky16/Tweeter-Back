@@ -57,6 +57,11 @@ const errorsMessage = {
       "Page is out of range",
       404
     ),
+    categoryNotfound: new CustomError(
+      "Category not found",
+      "Category not found",
+      404
+    ),
   },
   images: {
     imageCompressionError: {
