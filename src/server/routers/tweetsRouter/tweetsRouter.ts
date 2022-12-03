@@ -12,6 +12,7 @@ import {
   createTweet,
   getOneTweet,
   getTweets,
+  getTweetsByCategory,
 } from "../../controllers/tweetsControllers/tweetsControllers.js";
 import tweetSchema from "../../schemas/tweetSchema.js";
 
@@ -25,6 +26,7 @@ const upload = multer({
 });
 
 tweetsRouter.get("/", getTweets);
+tweetsRouter.get("/category/:category", getTweetsByCategory);
 tweetsRouter.get("/:idTweet", getOneTweet);
 tweetsRouter.post(
   "/create",
