@@ -4,7 +4,7 @@ export interface CustomRequest extends Request {
   userId: string;
 }
 
-export interface ImageRequest extends Request {
+export interface ImageRequest extends CustomRequest {
   image: File;
   imageFileName: string;
   publicImageUrl: string;
