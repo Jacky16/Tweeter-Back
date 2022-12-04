@@ -10,6 +10,7 @@ import {
 } from "../../controllers/imageControllers/imageControllers.js";
 import {
   createTweet,
+  deleteTweet,
   getOneTweet,
   getTweets,
   getTweetsByCategory,
@@ -37,5 +38,6 @@ tweetsRouter.post(
   backupImage,
   createTweet
 );
+tweetsRouter.delete("/delete/:idTweet", deleteTweet);
 
 export default tweetsRouter;
