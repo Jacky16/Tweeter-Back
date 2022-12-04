@@ -192,3 +192,40 @@ export const deleteTweet = async (
     next(error as Error);
   }
 };
+
+export const updateTweet = async (
+  req: ImageRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const { description, category, visibilityOpen, author } =
+    req.body as TweetBody;
+  const { idTweet } = req.params;
+  const { userId } = req;
+
+  try {
+    const tweet = await Tweet.findByIdAndUpdate(
+      idTweet,
+
+      {
+        description,
+        category,
+        image: req.imageFileName,
+        visibilityOpen,
+        author,
+      },
+      { new: true }
+    )
+      .where({ author: userId })
+      .exec();
+
+    if (!tweet) {
+      next(errorsMessage.tweets.errorOnEdit);
+      return;
+    }
+
+    res.status(200).json({ tweet });
+  } catch (error: unknown) {
+    next(error as Error);
+  }
+};

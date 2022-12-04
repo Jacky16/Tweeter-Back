@@ -14,6 +14,7 @@ import {
   getOneTweet,
   getTweets,
   getTweetsByCategory,
+  updateTweet,
 } from "../../controllers/tweetsControllers/tweetsControllers.js";
 import tweetSchema from "../../schemas/tweetSchema.js";
 
@@ -39,5 +40,13 @@ tweetsRouter.post(
   createTweet
 );
 tweetsRouter.delete("/delete/:idTweet", deleteTweet);
+tweetsRouter.patch(
+  "/update/:idTweet",
+  upload.single("image"),
+  renameImage,
+  formatImage,
+  backupImage,
+  updateTweet
+);
 
 export default tweetsRouter;
