@@ -4,7 +4,7 @@ import type { Error } from "mongoose";
 import categories from "../../../categories.js";
 import Tweet from "../../../database/models/Tweet.js";
 import errorsMessage from "../../../errorsMessage.js";
-import type { ImageRequest, TweetBody } from "../../types.js";
+import type { CustomRequest, ImageRequest, TweetBody } from "../../types.js";
 
 export const getTweets = async (
   req: Request,
@@ -162,6 +162,30 @@ export const getTweetsByCategory = async (
       currentPage: +page,
       tweets: tweetsToAdd,
     });
+  } catch (error: unknown) {
+    next(error as Error);
+  }
+};
+
+export const deleteTweet = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { idTweet } = req.params;
+    const { userId } = req;
+
+    const tweet = await Tweet.findByIdAndDelete(idTweet)
+      .where({ author: userId })
+      .exec();
+
+    if (!tweet) {
+      next(errorsMessage.tweet.tweetNotfound);
+      return;
+    }
+
+    res.status(200).json({ tweet });
   } catch (error: unknown) {
     next(error as Error);
   }
