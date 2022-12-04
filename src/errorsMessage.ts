@@ -62,6 +62,11 @@ const errorsMessage = {
       "Category not found",
       404
     ),
+    errorOnEdit: new CustomError(
+      "Can not edit tweet if you are not the author",
+      "Don't have permission to edit this item",
+      403
+    ),
   },
   images: {
     imageCompressionError: {

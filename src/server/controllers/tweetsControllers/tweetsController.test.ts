@@ -14,6 +14,7 @@ import {
   getOneTweet,
   getTweets,
   getTweetsByCategory,
+  updateTweet,
 } from "./tweetsControllers";
 
 const res: Partial<Response> = {
@@ -448,6 +449,68 @@ describe("Given the deleteTweet controller", () => {
 
         expect(next).toBeCalledWith(expectedError);
       });
+    });
+  });
+});
+
+describe("Given the updateTweet controller", () => {
+  const req: Partial<ImageRequest> = {
+    params: { idTweet: "1234" },
+    userId: "1234",
+    body: getRandomTweet(),
+    imageFileName: "image.jpg",
+  };
+
+  describe("When receive a ImageRequest with a tweet as body", () => {
+    test("Then it should return the response with status 200 and the tweet updated", async () => {
+      const expectedStatus = 200;
+      const expectedTweet = getRandomTweet();
+      const expectedJson = { tweet: expectedTweet };
+
+      Tweet.findByIdAndUpdate = jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          exec: jest.fn().mockReturnValue(expectedTweet),
+        }),
+      });
+
+      await updateTweet(req as ImageRequest, res as Response, null);
+
+      expect(res.status).toBeCalledWith(expectedStatus);
+      expect(res.json).toHaveBeenCalledWith(expectedJson);
+    });
+  });
+
+  describe("When receive a ImageRequest with a tweet as body and update the tweet fails", () => {
+    test("Then the next function should be called with the error 'Error on database'", async () => {
+      const expectedError = new Error("Error on database");
+
+      Tweet.findByIdAndUpdate = jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          exec: jest.fn().mockRejectedValue(expectedError),
+        }),
+      });
+
+      const next = jest.fn();
+      await updateTweet(req as ImageRequest, null, next);
+
+      expect(next).toBeCalledWith(expectedError);
+    });
+  });
+
+  describe("When receive a ImageRequest with a tweet as body and the author tweet is not the same that userId", () => {
+    test("Then the next function should be called with the error 'You can't edit this tweet'", async () => {
+      const expectedError = errorsMessage.tweets.errorOnEdit;
+
+      Tweet.findByIdAndUpdate = jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          exec: jest.fn().mockReturnValue(null),
+        }),
+      });
+
+      const next = jest.fn();
+      await updateTweet(req as ImageRequest, null, next);
+
+      expect(next).toBeCalledWith(expectedError);
     });
   });
 });

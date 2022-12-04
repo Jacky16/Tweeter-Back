@@ -220,7 +220,7 @@ export const updateTweet = async (
       .exec();
 
     if (!tweet) {
-      next(errorsMessage.tweet.tweetNotfound);
+      next(errorsMessage.tweets.errorOnEdit);
       return;
     }
 
