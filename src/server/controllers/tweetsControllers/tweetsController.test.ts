@@ -10,6 +10,7 @@ import {
 import type { CustomRequest, ImageRequest } from "../../types";
 import {
   createTweet,
+  deleteTweet,
   getOneTweet,
   getTweets,
   getTweetsByCategory,
@@ -388,6 +389,65 @@ describe("Given the createTweet controller", () => {
       await createTweet(req as ImageRequest, null, next);
 
       expect(next).toBeCalledWith(expectedError);
+    });
+  });
+});
+
+describe("Given the deleteTweet controller", () => {
+  const req: Partial<CustomRequest> = {
+    params: { idTweet: "1234" },
+    userId: "1234",
+  };
+  describe("When receive a Request with params with idTweet '1234'", () => {
+    test("Then it should return a response 200 with the tweet", async () => {
+      const expectedStatus = 200;
+      const expectedTweet = getRandomTweet();
+      const expectedJson = { tweet: expectedTweet };
+
+      Tweet.findByIdAndDelete = jest.fn().mockReturnValue({
+        where: jest.fn().mockReturnValue({
+          exec: jest.fn().mockReturnValue(expectedTweet),
+        }),
+      });
+
+      await deleteTweet(req as CustomRequest, res as Response, null);
+
+      expect(res.status).toBeCalledWith(expectedStatus);
+      expect(res.json).toBeCalledWith(expectedJson);
+    });
+
+    describe("And the tweets with id '1234' doesn't exist", () => {
+      test("Then the next function should be called with the error 'Tweet not found'", async () => {
+        const expectedError = errorsMessage.tweet.tweetNotfound;
+        const next = jest.fn();
+
+        Tweet.findByIdAndDelete = jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            exec: jest.fn().mockReturnValue(null),
+          }),
+        });
+
+        await deleteTweet(req as CustomRequest, null, next);
+
+        expect(next).toBeCalledWith(expectedError);
+      });
+    });
+
+    describe("And when try to delete the tweet from database and it fails", () => {
+      test("The next should be called with 'Error on database'", async () => {
+        const expectedError = new Error("Error on database");
+        const next = jest.fn();
+
+        Tweet.findByIdAndDelete = jest.fn().mockReturnValue({
+          where: jest.fn().mockReturnValue({
+            exec: jest.fn().mockRejectedValue(expectedError),
+          }),
+        });
+
+        await deleteTweet(req as CustomRequest, null, next);
+
+        expect(next).toBeCalledWith(expectedError);
+      });
     });
   });
 });
