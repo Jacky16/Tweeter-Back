@@ -24,6 +24,7 @@ export const getTweets = async (
     }
 
     const tweets = await Tweet.find()
+      .sort({ dateOfCreation: -1 })
       .limit(+limit)
       .skip((+page - 1) * +limit)
       .populate({ select: "username alias", path: "author" })
@@ -145,6 +146,7 @@ export const getTweetsByCategory = async (
     }
 
     const tweets = await Tweet.find({ category: categoryParam })
+      .sort({ dateOfCreation: -1 })
       .limit(+limit)
       .skip((+page - 1) * +limit)
       .populate({ select: "username alias", path: "author" })
