@@ -22,7 +22,11 @@ export const renameImage = async (
     const { originalname, destination, path: filePath } = req.file;
     const dateTime = Date.now();
 
-    const filenameWithoutExtension = removeExtension(originalname);
+    const filenameWithoutExtension = removeExtension(originalname).replace(
+      /[^a-zA-Z0-9-_]/g,
+      "-"
+    );
+
     const extensionFile = path.extname(originalname);
 
     const newFileName = `${filenameWithoutExtension}${dateTime}${extensionFile}`;
