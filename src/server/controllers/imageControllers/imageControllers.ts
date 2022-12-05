@@ -2,7 +2,6 @@ import type { NextFunction, Response } from "express";
 import type { ImageRequest } from "../../types";
 import fs from "fs/promises";
 import path from "path";
-import errorsMessage from "../../../errorsMessage.js";
 import sharp from "sharp";
 import { bucket } from "../../../utils/supabase.js";
 
@@ -16,7 +15,7 @@ export const renameImage = async (
 ) => {
   try {
     if (!req.file) {
-      next(errorsMessage.images.imageNotProvided);
+      next();
       return;
     }
 
@@ -44,6 +43,11 @@ export const formatImage = async (
   next: NextFunction
 ) => {
   try {
+    if (!req.file) {
+      next();
+      return;
+    }
+
     const { imageFileName } = req;
     const { destination } = req.file;
     const fileExtension = path.extname(imageFileName);
@@ -69,6 +73,11 @@ export const backupImage = async (
   res: Response,
   next: NextFunction
 ) => {
+  if (!req.file) {
+    next();
+    return;
+  }
+
   const { imageFileName } = req;
   const { destination } = req.file;
   try {

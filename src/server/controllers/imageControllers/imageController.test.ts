@@ -1,4 +1,3 @@
-import errorsMessage from "../../../errorsMessage";
 import { getRandomTweet } from "../../../factories/tweetsFactory";
 import type { ImageRequest } from "../../types";
 import { backupImage, formatImage, renameImage } from "./imageControllers";
@@ -27,17 +26,7 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-beforeAll(async () => {
-  await fs.writeFile(path.join(uploadPath, nameFile.name), nameFile.name);
-});
-
-afterAll(async () => {
-  await fs.unlink(
-    path.join(uploadPath, `${nameFile.name}${timestamp}${nameFile.extension}`)
-  );
-});
-
-const mockFile = jest.fn();
+let mockFile = jest.fn();
 jest.mock("sharp", () => () => ({
   webp: jest.fn().mockReturnValue({
     toFormat: jest.fn().mockReturnValue({
@@ -60,18 +49,19 @@ describe("Given the renameImage controller", () => {
     test("Then the next function should be called", async () => {
       await renameImage(req as ImageRequest, null, next);
 
+      path.extname = jest.fn().mockReturnValue(nameFile.extension);
+
+      fs.rename = jest.fn().mockResolvedValue(null);
       expect(next).toHaveBeenCalled();
     });
   });
 
   describe("When receives a Image Request without an image file", () => {
-    test("Then the next function should be called with and error 'Image not provided'", async () => {
-      const expectedError = errorsMessage.images.imageNotProvided;
-
+    test("Then the next function should be called'", async () => {
       req.file = null;
       await renameImage(req as ImageRequest, null, next);
 
-      expect(next).toHaveBeenCalledWith(expectedError);
+      expect(next).toHaveBeenCalled();
     });
   });
 
@@ -80,7 +70,7 @@ describe("Given the renameImage controller", () => {
       const expectedError = new Error("Error");
       req.file = file as Express.Multer.File;
 
-      fs.rename = jest.fn().mockRejectedValueOnce(expectedError);
+      fs.rename = jest.fn().mockRejectedValue(expectedError);
 
       await renameImage(req as ImageRequest, null, next);
 
@@ -100,10 +90,26 @@ describe("Given the formatImage controller", () => {
   req.file = file as Express.Multer.File;
   req.imageFileName = `${nameFile.name}${timestamp}${nameFile.extension}`;
 
+  describe("When receives a Image Request with an image file null", () => {
+    test("Then the next function should be called", async () => {
+      const request: Partial<ImageRequest> = {
+        ...req,
+        file: null,
+      };
+      await formatImage(request as ImageRequest, null, next);
+
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
   describe("When receives a Image Request with an image file", () => {
     test("Then the next function should be called", async () => {
+      const request: Partial<ImageRequest> = {
+        ...req,
+      };
+
       fs.unlink = jest.fn().mockResolvedValueOnce(true);
-      await formatImage(req as ImageRequest, null, next);
+      await formatImage(request as ImageRequest, null, next);
 
       expect(next).toHaveBeenCalled();
     });
@@ -111,8 +117,12 @@ describe("Given the formatImage controller", () => {
 
   describe("When receives a Image Request with an image file and fs link reject a error", () => {
     test("Then the next function should be called", async () => {
-      fs.unlink = jest.fn().mockRejectedValueOnce(new Error("Error"));
-      await formatImage(req as ImageRequest, null, next);
+      const request: Partial<ImageRequest> = {
+        ...req,
+      };
+      mockFile = jest.fn().mockRejectedValue(new Error("Error"));
+
+      await formatImage(request as ImageRequest, null, next);
 
       expect(next).toHaveBeenCalled();
     });
@@ -135,17 +145,25 @@ describe("Given the backupImage controller", () => {
     });
   });
 
-  describe("When recives a ImageRequest inalid image", () => {
-    test("Then the next function should be called with a error", async () => {
-      const expectedError = new Error("Error");
-
-      fs.readFile = jest.fn().mockResolvedValue(true);
-
-      bucket.upload = jest.fn().mockRejectedValueOnce(expectedError);
+  describe("When receives a Image Request with an image file and fs read reject a error", () => {
+    test("Then the next function should be called", async () => {
+      fs.readFile = jest.fn().mockRejectedValue(new Error("Error"));
 
       await backupImage(req as ImageRequest, null, next);
 
-      expect(next).toHaveBeenCalledWith(expectedError);
+      expect(next).toHaveBeenCalled();
+    });
+  });
+  describe("When receives a ImageRequest without image", () => {
+    test("Then the next function should be called", async () => {
+      const request: Partial<ImageRequest> = {
+        ...req,
+        file: null,
+      };
+
+      await backupImage(request as ImageRequest, null, next);
+
+      expect(next).toHaveBeenCalled();
     });
   });
 });
