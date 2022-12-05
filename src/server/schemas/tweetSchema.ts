@@ -9,6 +9,7 @@ const tweetSchema = {
       .required(),
     visibilityOpen: Joi.boolean().required(),
     description: Joi.string().required().max(280),
+    image: Joi.binary(),
   }),
 };
 
