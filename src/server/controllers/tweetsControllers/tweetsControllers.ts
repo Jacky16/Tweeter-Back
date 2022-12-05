@@ -206,11 +206,10 @@ export const updateTweet = async (
   try {
     const tweet = await Tweet.findByIdAndUpdate(
       idTweet,
-
       {
         description,
         category,
-        image: req.imageFileName,
+        image: req?.imageFileName,
         visibilityOpen,
         author,
       },

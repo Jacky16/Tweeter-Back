@@ -32,7 +32,6 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await User.deleteMany({});
   await mongoose.disconnect();
   await server.stop();
 });
