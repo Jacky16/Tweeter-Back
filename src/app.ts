@@ -13,6 +13,7 @@ import userRouter from "./server/routers/userRouter/userRouter.js";
 
 const app = express();
 app.disable("x-powered-by");
+app.enable("trust proxy");
 app.use("/assets", express.static("assets"), getTweetImage);
 
 app.use(cors(corsOptions));
