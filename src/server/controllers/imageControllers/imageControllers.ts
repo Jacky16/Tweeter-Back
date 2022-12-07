@@ -58,7 +58,7 @@ export const formatImage = async (
     const fileBaseName = path.basename(imageFileName, fileExtension);
 
     await sharp(path.join(destination, imageFileName))
-      .webp({ quality: 90 })
+      .webp({ quality: 30 })
       .toFormat("webp")
       .toFile(path.join(destination, `${fileBaseName}.webp`));
 
@@ -89,7 +89,9 @@ export const backupImage = async (
       path.join(destination, imageFileName)
     );
 
-    await bucket.upload(imageFileName, fileContent);
+    await bucket.upload(imageFileName, fileContent, {
+      cacheControl: "31536000",
+    });
 
     const {
       data: { publicUrl },
