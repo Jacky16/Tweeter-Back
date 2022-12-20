@@ -6,27 +6,18 @@ import path from "path";
 import { bucket } from "../../../utils/supabase";
 
 const uploadPath = "assets/images";
-const nameFile = {
+const fileName = {
   name: "test",
   extension: ".jpg",
 };
 
 const tweet = getRandomTweet();
-const req: Partial<ImageRequest> = {
-  body: tweet,
-};
-
-const next = jest.fn();
 
 const timestamp = Date.now();
 jest.useFakeTimers();
 jest.setSystemTime(timestamp);
 
-beforeEach(() => {
-  jest.clearAllMocks();
-});
-
-let mockFile = jest.fn();
+const mockFile = jest.fn();
 jest.mock("sharp", () => () => ({
   webp: jest.fn().mockReturnValue({
     toFormat: jest.fn().mockReturnValue({
@@ -35,135 +26,179 @@ jest.mock("sharp", () => () => ({
   }),
 }));
 
-describe("Given the renameImage controller", () => {
-  const file: Partial<Express.Multer.File> = {
-    originalname: `${nameFile.name}`,
-    filename: "hash",
-    destination: uploadPath,
-    path: path.join(uploadPath, nameFile.name),
-  };
+const file: Partial<Express.Multer.File> = {
+  originalname: `${fileName.name}${fileName.extension}`,
+  destination: path.join(uploadPath),
+  path: path.join(uploadPath, `${fileName.name}${fileName.extension}`),
+};
+const req: Partial<ImageRequest> = {
+  body: tweet,
+};
 
-  req.file = file as Express.Multer.File;
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
-  describe("When receives a Image Request with an image file", () => {
+const next = jest.fn();
+
+describe("Given the renameImage middleware", () => {
+  beforeAll(async () => {
+    const filePath = path.join(
+      uploadPath,
+      `${fileName.name}${fileName.extension}`
+    );
+    await fs.writeFile(filePath, `${fileName.name}${fileName.extension}`);
+  });
+  afterAll(async () => {
+    await fs.unlink(
+      path.join(uploadPath, `${fileName.name}${timestamp}${fileName.extension}`)
+    );
+  });
+
+  describe("When receives a image request with file", () => {
+    const request = { ...req };
+    request.file = file as Express.Multer.File;
+    test(`Then the file should be renamed with test${timestamp}${fileName.extension}`, async () => {
+      const expectedFileName = `${fileName.name}${timestamp}${fileName.extension}`;
+
+      await renameImage(request as ImageRequest, null, next);
+
+      expect(request.imageFileName).toBe(expectedFileName);
+    });
+  });
+
+  describe("When receives a image request without file", () => {
     test("Then the next function should be called", async () => {
       await renameImage(req as ImageRequest, null, next);
-
-      path.extname = jest.fn().mockReturnValue(nameFile.extension);
-
-      fs.rename = jest.fn().mockResolvedValue(null);
       expect(next).toHaveBeenCalled();
     });
   });
 
-  describe("When receives a Image Request without an image file", () => {
-    test("Then the next function should be called'", async () => {
-      req.file = null;
-      await renameImage(req as ImageRequest, null, next);
+  describe("When receives a image request with file and the rename reject a error", () => {
+    const request = { ...req };
+    request.file = file as Express.Multer.File;
 
-      expect(next).toHaveBeenCalled();
-    });
-  });
-
-  describe("When receives a Image Request with an image file and rename file throw a error", () => {
     test("Then the next function should be called with the error", async () => {
       const expectedError = new Error("Error");
-      req.file = file as Express.Multer.File;
-
       fs.rename = jest.fn().mockRejectedValue(expectedError);
 
-      await renameImage(req as ImageRequest, null, next);
+      await renameImage(request as ImageRequest, null, next);
 
       expect(next).toHaveBeenCalledWith(expectedError);
     });
   });
 });
 
-describe("Given the formatImage controller", () => {
-  const file: Partial<Express.Multer.File> = {
-    originalname: `${nameFile.name}${nameFile.extension}`,
-    filename: "hash",
-    destination: uploadPath,
-    path: path.join(uploadPath, nameFile.name),
-  };
+describe("Given the formatImage middleware", () => {
+  beforeAll(async () => {
+    const filePath = path.join(
+      uploadPath,
+      `${fileName.name}${timestamp}${fileName.extension}`
+    );
 
-  req.file = file as Express.Multer.File;
-  req.imageFileName = `${nameFile.name}${timestamp}${nameFile.extension}`;
+    await fs.writeFile(
+      filePath,
+      `${fileName.name}${timestamp}${fileName.extension}`
+    );
+  });
 
-  describe("When receives a Image Request with an image file null", () => {
-    test("Then the next function should be called", async () => {
-      const request: Partial<ImageRequest> = {
-        ...req,
-        file: null,
-      };
+  describe("When receives a image request with file", () => {
+    const request = { ...req };
+    request.file = file as Express.Multer.File;
+    request.imageFileName = `${fileName.name}${timestamp}${fileName.extension}`;
+
+    test(`Then the image should be formatted to .webp with the name ${fileName.name}${timestamp}.webp `, async () => {
       await formatImage(request as ImageRequest, null, next);
 
+      expect(mockFile).toHaveBeenCalledWith(
+        path.join(uploadPath, `${fileName.name}${timestamp}.webp`)
+      );
+    });
+  });
+
+  describe("When receives a image request without file", () => {
+    test("Then the next function should be called", async () => {
+      await formatImage(req as ImageRequest, null, next);
       expect(next).toHaveBeenCalled();
     });
   });
 
-  describe("When receives a Image Request with an image file", () => {
-    test("Then the next function should be called", async () => {
-      const request: Partial<ImageRequest> = {
-        ...req,
-      };
+  describe("When receives a image request with file and the formatImage reject a error", () => {
+    const request = { ...req };
+    request.file = file as Express.Multer.File;
+    request.imageFileName = `${fileName.name}${timestamp}${fileName.extension}`;
 
-      fs.unlink = jest.fn().mockResolvedValueOnce(true);
-      await formatImage(request as ImageRequest, null, next);
-
-      expect(next).toHaveBeenCalled();
-    });
-  });
-
-  describe("When receives a Image Request with an image file and fs link reject a error", () => {
-    test("Then the next function should be called", async () => {
-      const request: Partial<ImageRequest> = {
-        ...req,
-      };
-      mockFile = jest.fn().mockRejectedValue(new Error("Error"));
+    test("Then the next function should be called with the error", async () => {
+      const expectedError = new Error("Error");
+      mockFile.mockRejectedValue(expectedError);
 
       await formatImage(request as ImageRequest, null, next);
 
-      expect(next).toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(expectedError);
     });
   });
 });
 
-describe("Given the backupImage controller", () => {
-  describe("When receives a Image Request with an image file", () => {
-    test("Then the next function should be called", async () => {
-      fs.readFile = jest.fn().mockResolvedValue(true);
+describe("Given the backupImage middleware", () => {
+  beforeAll(async () => {
+    const filePath = path.join(
+      uploadPath,
+      `${fileName.name}${timestamp}${fileName.extension}`
+    );
 
-      bucket.upload = jest.fn().mockResolvedValueOnce({
+    await fs.writeFile(
+      filePath,
+      `${fileName.name}${timestamp}${fileName.extension}`
+    );
+  });
+
+  afterAll(async () => {
+    await fs.unlink(
+      path.join(uploadPath, `${fileName.name}${timestamp}${fileName.extension}`)
+    );
+  });
+
+  describe("When receives a image request with file", () => {
+    const request = { ...req };
+    request.file = file as Express.Multer.File;
+    request.imageFileName = `${fileName.name}${timestamp}${fileName.extension}`;
+
+    test("Then publicImageUrl of imageRequest should be https://test.com", async () => {
+      const expectedPublicUrl = "https://test.com";
+
+      bucket.upload = jest.fn().mockResolvedValue(true);
+      bucket.getPublicUrl = jest.fn().mockReturnValue({
         data: {
-          publicUrl: "url",
+          publicUrl: expectedPublicUrl,
         },
       });
-      await backupImage(req as ImageRequest, null, next);
-
-      expect(next).toHaveBeenCalled();
-    });
-  });
-
-  describe("When receives a Image Request with an image file and fs read reject a error", () => {
-    test("Then the next function should be called", async () => {
-      fs.readFile = jest.fn().mockRejectedValue(new Error("Error"));
-
-      await backupImage(req as ImageRequest, null, next);
-
-      expect(next).toHaveBeenCalled();
-    });
-  });
-  describe("When receives a ImageRequest without image", () => {
-    test("Then the next function should be called", async () => {
-      const request: Partial<ImageRequest> = {
-        ...req,
-        file: null,
-      };
 
       await backupImage(request as ImageRequest, null, next);
 
+      expect(request.publicImageUrl).toBe(expectedPublicUrl);
+    });
+  });
+
+  describe("When receives a image request without file", () => {
+    test("Then the next function should be called", async () => {
+      await backupImage(req as ImageRequest, null, next);
+
       expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe("When receives a image request with file and the backupImage reject a error", () => {
+    const request = { ...req };
+    request.file = file as Express.Multer.File;
+    request.imageFileName = `${fileName.name}${timestamp}${fileName.extension}`;
+
+    test("Then the next function should be called with the error", async () => {
+      const expectedError = new Error("Error");
+      bucket.upload = jest.fn().mockRejectedValue(expectedError);
+
+      await backupImage(request as ImageRequest, null, next);
+
+      expect(next).toHaveBeenCalledWith(expectedError);
     });
   });
 });
