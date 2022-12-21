@@ -9,17 +9,22 @@
 
 Welcome to the Tweeter REST API! This API allows you to access and manipulate data on the Tweeter platform. This API is developed using CD/CI with the follow technologies:
 
-- TypeScript
-- Express
-- Supertest
-- Multer
-- Supabase
-- JSON Web Token (JWT)
-- Sharp
-- MongoDB
-- bcrypt
-- Express validation
-- Jest
+<div align="center">
+
+![Typescript](https://img.shields.io/badge/-Typescript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![NodeJS](https://img.shields.io/badge/-NodeJS-339933?style=flat-square&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/-Express-000000?style=flat-square&logo=express&logoColor=white)
+![Express validation](https://img.shields.io/badge/-Express%20validation-000000?style=flat-square&logo=express-validation&logoColor=white)
+![MongoDB](https://img.shields.io/badge/-MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)
+![Jest](https://img.shields.io/badge/-Jest-C21325?style=flat-square&logo=jest&logoColor=white)
+![Supertest](https://img.shields.io/badge/-Supertest-000000?style=flat-square&logo=supertest&logoColor=white)
+![Multer](https://img.shields.io/badge/-Multer-000000?style=flat-square&logo=multer&logoColor=white)
+![Supabase](https://img.shields.io/badge/-Supabase-000000?style=flat-square&logo=supabase&logoColor=white)
+![JSON Web Token](https://img.shields.io/badge/-JSON%20Web%20Token-000000?style=flat-square&logo=json-web-token&logoColor=white)
+![Sharp](https://img.shields.io/badge/-Sharp-000000?style=flat-square&logo=sharp&logoColor=white)
+![bcrypt](https://img.shields.io/badge/-bcrypt-000000?style=flat-square&logo=bcrypt&logoColor=white)
+
+</div>
 
 This API is used by the [Tweeter frontend project](https://github.com/Jacky16/Tweeter-Front).
 
